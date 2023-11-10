@@ -11,7 +11,6 @@ on:
 
 jobs:
   fail-for-do-not-merge:
-    if: contains(github.event.pull_request.labels.*.name, 'DO NOT MERGE')
     runs-on: ubuntu-latest
     steps:
       - name: Fail if PR is labeled with do not merge
@@ -19,7 +18,7 @@ jobs:
           if contains(github.event.pull_request.labels.*.name, 'DO NOT MERGE'); then
              echo "This PR can't be merged, due to the 'DO NOT MERGE' label."
              exit 1
-           else
+          else
              echo "This PR is not labeled with 'DO NOT MERGE'. It can be merged."
              exit 0
-           fi    else: # This is the part that I'm not sure about
+          fi
