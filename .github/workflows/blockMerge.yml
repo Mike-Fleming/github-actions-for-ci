@@ -16,7 +16,8 @@ jobs:
       - name: Check if PR is labeled with do not merge
         id: check-label
         run: |
-          if contains(github.event.pull_request.labels.*.name, 'DO NOT MERGE'); then
+          LABELS=$(echo '${{ toJson(github.event.pull_request.labels.*.name) }}')
+          if [[ $LABELS == *"DO NOT MERGE"* ]]; then
             echo "This PR can't be merged, due to the 'DO NOT MERGE' label."
             exit 1
           else
