@@ -18,3 +18,8 @@ jobs:
         run: |
           echo "This PR can't be merged, due to the 'DO NOT MERGE' label."
           exit 1
+    else: # This is the part that I'm not sure about
+      - name: Continue if PR is not labeled with do not merge
+        run: |
+          echo "This PR can be merged."
+          exit 0
