@@ -16,10 +16,10 @@ jobs:
     steps:
       - name: Fail if PR is labeled with do not merge
         run: |
-          echo "This PR can't be merged, due to the 'DO NOT MERGE' label."
-          exit 1
-    else: # This is the part that I'm not sure about
-      - name: Continue if PR is not labeled with do not merge
-        run: |
-          echo "This PR can be merged."
-          exit 0
+          if contains(github.event.pull_request.labels.*.name, 'DO NOT MERGE'); then
+             echo "This PR can't be merged, due to the 'DO NOT MERGE' label."
+             exit 1
+           else
+             echo "This PR is not labeled with 'DO NOT MERGE'. It can be merged."
+             exit 0
+           fi    else: # This is the part that I'm not sure about
