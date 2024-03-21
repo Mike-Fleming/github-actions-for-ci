@@ -1,0 +1,21 @@
+changelog:
+  categories:
+    - title: 🚀 New Features
+      labels:
+        - enhancement
+        - feature
+    - title: 🐛 Bug Fixes
+      labels:
+        - bug
+    - title: 🔨 Project Task
+      labels:
+        - task
+    - title: 🔧 Internal Optimizations
+      labels:
+        - internal optimization
+    - title: 👒 Dependencies
+      labels:
+        - dependencies
+    - title: Other Changes
+      labels:
+        - "*"
