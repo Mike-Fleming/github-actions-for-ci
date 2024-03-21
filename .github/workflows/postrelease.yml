@@ -1,0 +1,65 @@
+name: Post Merge to Master
+
+on:
+ push:
+    branches:
+      - main
+ workflow_dispatch:
+
+jobs:
+ create_release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install jq
+      run: npm install -g jq
+
+    - name: Set up Git
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+
+    - name: Get version from config.json
+      id: get_version
+      run: |
+        echo "::set-output name=version::$(jq -r '.__version' resources/config.json)"
+
+    - name: Create and push tag
+      run: |
+        git tag ${{ steps.get_version.outputs.version }}
+        git push origin ${{ steps.get_version.outputs.version }}
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.get_version.outputs.version }}
+        release_name: Release ${{ steps.get_version.outputs.version }}
+        draft: false
+        prerelease: false
+
+ merge_to_staging:
+    needs: create_release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout staging branch
+      uses: actions/checkout@v2
+      with:
+        ref: staging
+
+    - name: Merge master into staging
+      run: |
+        git checkout staging
+        git merge master --no-edit
+        git push origin staging
+
