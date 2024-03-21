@@ -4,7 +4,6 @@ on:
  push:
     branches:
       - main
- workflow_dispatch:
 
 jobs:
  create_release:
@@ -26,32 +25,30 @@ jobs:
     - name: Get version from config.json
       id: get_version
       run: |
-        echo "::set-output name=version::$(jq -r '.__version' resources/config.json)"
+        echo "version=$(jq -r '.__version' resources/config.json)" >> $GITHUB_ENV
 
     - name: Check if tag exists
       id: check_tag
       run: |
-        TAG=${{ steps.get_version.outputs.version }}
-        if git show-ref --tags --verify --quiet "refs/tags/${TAG}"; then
-          echo "::set-output name=exists::true"
+        if git show-ref --tags --verify --quiet "refs/tags/${{ env.version }}"; then
+          echo "exists=true" >> $GITHUB_ENV
         else
-          echo "::set-output name=exists::false"
+          echo "exists=false" >> $GITHUB_ENV
         fi
-  
-    - name: Create and push tag
-      if: steps.check_tag.outputs.exists == 'false'
-      run: |
-        git tag ${{ steps.get_version.outputs.version }}
-        git push origin ${{ steps.get_version.outputs.version }}
 
+    - name: Create and push tag
+      if: env.exists == 'false'
+      run: |
+        git tag ${{ env.version }}
+        git push origin ${{ env.version }}
 
     - name: Create GitHub Release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.get_version.outputs.version }}
-        release_name: ${{ steps.get_version.outputs.version }}
+        tag_name: ${{ env.version }}
+        release_name: Release ${{ env.version }}
         draft: false
         prerelease: false
 
@@ -64,12 +61,8 @@ jobs:
       with:
         ref: staging
 
-    - name: Fetch all branches
-      run: git fetch --all
-
     - name: Merge master into staging
       run: |
         git checkout staging
         git merge origin/main --no-edit
         git push origin staging
-
