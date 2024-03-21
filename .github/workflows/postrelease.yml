@@ -64,6 +64,6 @@ jobs:
     - name: Merge master into staging
       run: |
         git checkout staging
-        git merge origin/master --no-edit
+        git merge origin/main --no-edit
         git push origin staging
 
