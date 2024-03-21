@@ -33,7 +33,18 @@ jobs:
       run: |
         echo "::set-output name=version::$(jq -r '.__version' resources/config.json)"
 
+    - name: Check if tag exists
+      id: check_tag
+      run: |
+        TAG=${{ steps.get_version.outputs.version }}
+        if git show-ref --tags --verify --quiet "refs/tags/${TAG}"; then
+          echo "::set-output name=exists::true"
+        else
+          echo "::set-output name=exists::false"
+        fi
+  
     - name: Create and push tag
+      if: steps.check_tag.outputs.exists == 'false'
       run: |
         git tag ${{ steps.get_version.outputs.version }}
         git push origin ${{ steps.get_version.outputs.version }}
