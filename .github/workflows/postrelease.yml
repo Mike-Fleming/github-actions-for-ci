@@ -45,22 +45,22 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ steps.get_version.outputs.version }}
-        release_name: Release ${{ steps.get_version.outputs.version }}
+        release_name: ${{ steps.get_version.outputs.version }}
         draft: false
         prerelease: false
 
-#  merge_to_staging:
-#     needs: create_release
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: Checkout staging branch
-#       uses: actions/checkout@v2
-#       with:
-#         ref: staging
+ merge_to_staging:
+    needs: create_release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout staging branch
+      uses: actions/checkout@v2
+      with:
+        ref: staging
 
-#     - name: Merge master into staging
-#       run: |
-#         git checkout staging
-#         git merge master --no-edit
-#         git push origin staging
+    - name: Merge master into staging
+      run: |
+        git checkout staging
+        git merge master --no-edit
+        git push origin staging
 
