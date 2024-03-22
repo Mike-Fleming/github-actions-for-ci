@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -57,15 +57,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout staging branch
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         ref: staging
 
     - name: Fetch all branches
       run: git fetch --all
 
-    - name: Merge master into staging
-      run: |
-        git checkout staging
-        git merge origin/main --no-edit
-        git push origin staging
+    - name: Create PR to staging
+      uses: actions/github-script@v5
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const { owner, repo } = context.repo
+          const { data: pullRequests } = await github.rest.pulls.list({
+            owner,
+            repo,
+            state: 'open',
+            head: `${owner}:merge-to-staging`
+          })
+
+          if (pullRequests.length === 0) {
+            await github.rest.pulls.create({
+              owner,
+              repo,
+              title: `Merge master to staging`,
+              head: `main`,
+              base: 'staging',
+              body: 'This PR merges changes from master into staging.'
+            })
+          }
