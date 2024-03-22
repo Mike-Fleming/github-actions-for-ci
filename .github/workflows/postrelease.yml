@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout staging branch
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         ref: staging
 
@@ -74,7 +74,7 @@ jobs:
             owner,
             repo,
             state: 'open',
-            head: `${owner}:merge-to-staging-${version}`
+            head: `${owner}:merge-to-staging`
           })
 
           if (pullRequests.length === 0) {
