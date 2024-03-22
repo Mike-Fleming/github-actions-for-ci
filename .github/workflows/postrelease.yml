@@ -70,7 +70,6 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const { owner, repo } = context.repo
-          const version = process.env.version
           const { data: pullRequests } = await github.rest.pulls.list({
             owner,
             repo,
@@ -82,11 +81,9 @@ jobs:
             await github.rest.pulls.create({
               owner,
               repo,
-              title: `Merge ${version} to staging`,
+              title: `Merge master to staging`,
               head: `main`,
               base: 'staging',
               body: 'This PR merges changes from master into staging.'
             })
           }
-      env:
-        version: ${{ env.version }}
